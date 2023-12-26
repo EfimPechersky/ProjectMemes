@@ -1,0 +1,225 @@
+<html>
+    <head>
+        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+	<link href="main.css" rel="stylesheet" type="text/css">
+    </head>
+	<header>
+		<a class="aut" href="secondpage.html">Авторизация</a>
+	</header>
+    <body>	
+        <form class="uploader" name="uploader" enctype="multipart/form-data" method="POST">
+        Загрузить картинку: <input name="userfile" type="file" />
+	<input class="username" name="username" type="text"/>
+        <button type="submit" name="submit">Загрузить</button>
+    </form>
+	
+<script>
+	var nam=document.querySelector(".username");
+	nam.style.display="none";
+	lenta=document.createElement("div")
+	lenta.style.width="800px";
+	lenta.style.height="100%";
+	lenta.style.marginLeft="25%";
+	if (localStorage.getItem("islog")=="yes"){
+		aut=document.querySelector(".aut");
+		aut.innerHTML=localStorage.getItem("logname");
+        }else{
+		var upl=document.querySelector(".uploader");
+		upl.style.display="none";
+	}
+	$.ajax({
+	url: 'test.php',         /* Куда пойдет запрос */
+	type: 'post',             /* Метод передачи (post или get) */
+	dataType: 'html',          /* Тип данных в ответе (xml, json, script, html). */    /* Параметры передаваемые в запросе. */
+	success: function(data){   /* функция которая будет выполнена после успешного запроса.  */
+		let arr=data.split(",");
+        	for (let i=0;i<arr.length;i++){
+       	     		arr[i]=arr[i].split(" ");
+        	}
+        	for (let i=arr.length-2;i>-1;i--){
+       	     		let pst=document.createElement("div");
+			let deletebutton=document.createElement("button");
+			deletebutton.innerHTML="del";
+			deletebutton.addEventListener("click",function(event){
+				pst.style.display="none";
+				$.ajax({
+	                    		url: 'delpost.php',
+	                    		method: 'post', 
+                        		data:{
+                            			postid:pst.id                        		}, 
+	                    		dataType: 'html',
+	                    		success: function(data){
+						alert('Success!');
+					},
+                        		error:function(data){
+		                    		alert("Error!")
+                        		},
+                    		});
+
+				
+			});
+			if (localStorage.getItem("logname")=="admin"){
+				pst.appendChild(deletebutton);
+			}
+			let likesnum=0;
+			if (i!=0){
+				if (arr[i][arr[i].length-1]!=""){
+					likesnum=arr[i].length-4;
+				}else{
+					likesnum=arr[i].length-5;
+				}
+			}else{
+				if (arr[i][arr[i].length-1]!=""){
+					likesnum=arr[i].length-3;
+				}else{
+					likesnum=arr[i].length-4;
+				}
+
+			} 
+
+			pst.style.border="1px solid black";
+			pst.style.backgroundColor="#cfd8f3";
+			pst.style.boxShadow="2px 10px 10px black";
+			pst.style.marginTop="15px";
+			pst.id=arr[i][1];
+			let img=document.createElement("img");
+			if (i!=0){
+			img.src="./uploads/"+arr[i][3];
+			}else{
+			img.src="./uploads/"+arr[i][2];
+			}
+			img.style.display="block";
+			img.style.marginLeft="auto";
+			img.style.marginRight="auto";
+			img.style.marginTop="20px";
+			if (img.width>600){
+				img.width=600
+			}
+			let name=document.createElement("div");
+                        let likes=document.createElement("div");
+			let likestext=document.createElement("div");
+			likestext.style.marginLeft="10px";
+			likestext.style.display="inline";
+			let likebutton1=document.createElement("input");
+			likebutton1.type="checkbox";
+			likebutton1.id="lb"+pst.id;
+			likebutton1.style.display="none";
+			let likebutton2=document.createElement("label");
+			likebutton2.setAttribute("for","lb"+pst.getAttribute("id"));
+			likebutton2.innerHTML="&#9829";
+			likebutton2.style.fontSize="20px";
+			if (i!=0){
+			name.innerHTML="by "+arr[i][2];
+			for (let j=4;j<arr[i].length;j++){
+				if (arr[i][j]==localStorage.getItem("logid")){
+					likebutton2.style.color="red";
+					likebutton1.checked=1;
+				}
+			}
+			}else{
+				for (let j=3;j<arr[i].length;j++){
+				if (arr[i][j]==localStorage.getItem("logid")){
+					likebutton2.style.color="red";
+					likebutton1.checked=1;
+				}
+			}
+
+			name.innerHTML="by "+arr[i][1];
+			pst.id=arr[i][0];
+			}
+			if (localStorage.getItem("islog")=="yes"){
+				likes.appendChild(likebutton1);
+				likes.appendChild(likebutton2);
+        		}
+			likestext.innerHTML=String(likesnum)+" likes";
+			likebutton2.style.marginLeft="30px";
+			likestext.style.display="inline";
+			name.style.display="inline";
+			name.style.marginLeft="90%";
+			likebutton2.style.fontSize="50px";
+			likestext.style.fontSize="20px";
+			likebutton2.addEventListener("click",function(event){
+				if (likebutton1.checked){
+					likebutton2.style.color="black";
+					$.ajax({
+	                    			url: 'removelike.php',
+	                    			method: 'post', 
+                        			data:{
+                            				postid:pst.id,
+                            				userid:localStorage.getItem("logid")
+                        			}, 
+	                    			dataType: 'html',
+	                    			success: function(data){
+						},
+                        			error:function(data){
+		                    			alert("Error!")
+                        			},
+                    			});
+					likesnum--;
+					likestext.innerHTML=String(likesnum)+" likes";
+
+				}else{
+					likebutton2.style.color="red";
+					$.ajax({
+	                    			url: 'addlike.php',         /* Куда пойдет запрос */
+	                    			method: 'post', 
+                        			data:{
+                            				postid:pst.id,
+                            				userid:localStorage.getItem("logid")
+                        			},            /* Метод передачи (post или get) */
+	                    			dataType: 'html',          /* Тип данных в ответе (xml, json, script, html). */    /* Параметры передаваемые в запросе. */
+	                    			success: function(data){
+						},
+                        			error:function(data){   /* функция которая будет выполнена после успешного запроса.  */
+		                    			alert("Error!")
+                        			},
+                    			});
+
+					
+					likesnum++;
+					likestext.innerHTML=String(likesnum)+" likes";
+
+				}
+			});
+			
+			likes.appendChild(likestext);
+			pst.appendChild(img);
+			pst.appendChild(likes)
+			pst.appendChild(name);
+			lenta.appendChild(pst);
+        	}
+		document.body.appendChild(lenta);
+
+	}
+});    </script>
+    <script type="text/javascript">
+	var nam=document.querySelector(".username");
+        nam.value=localStorage.getItem("logname");
+    	$("form[name='uploader']").submit(function(e) {
+	if (localStorage.getItem("islog")=="yes"){
+
+        var formData = new FormData($(this)[0]);
+        $.ajax({
+            url: 'file.php',
+            type: "POST",
+            data: formData,
+            async: false,
+            success: function (msg) {
+                alert(msg);
+            },
+            error: function(msg) {
+                alert('Ошибка!');
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+	}else{
+          alert("Вы не авторизованы!");
+	}
+        e.preventDefault();
+    });
+    </script>
+    </body>
+</html>

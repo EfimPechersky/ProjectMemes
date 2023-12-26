@@ -1,0 +1,18 @@
+header{
+	background: linear-gradient(1800deg, #e3f3fc, #8fd5f7 100%);
+	height:40px;
+	margin:0;
+}
+body {
+	padding:0;
+	margin:0;
+	background: linear-gradient(90deg, #aea4e3, #d3ffe8);
+}
+.uploader{
+	margin-top:10px;
+	margin-left:20%;
+}
+.aut{
+	margin-top:15px;
+	margin-left:15px;
+}

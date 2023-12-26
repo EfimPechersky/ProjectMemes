@@ -1,0 +1,92 @@
+<html>
+    <head>
+        <link href="secondstyle.css" rel="stylesheet" type="text/css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    </head>
+	<header>
+		<a href="EfimPech.html">Главная</a>
+	</header>
+    <body>
+     <div class="log">
+        <form>
+            <div>Авторизация</div>
+            <label>Логин</label><input type="text" class="loginlogin">
+            <label>Пароль</label><input type="password" class="loginpassword">
+        </form>
+	<button class="sub1">Войти</button>
+     </div>
+     <div class="reg">
+        <form>
+            <div>Регистрация</div>
+            <label>Логин</label><input type="text" class="reglogin">
+            <label>Пароль</label><input type="password" class="regpassword1">
+            <label>Пароль</label><input type="password" class="regpassword2">
+        </form>
+	<button class="sub2">Зарегистрироваться</button>
+     </div>
+        <script>
+            llogin=document.querySelector(".loginlogin");
+            lpassword=document.querySelector(".loginpassword");
+            rlogin=document.querySelector(".reglogin");
+            rpassword1=document.querySelector(".regpassword1");
+            rpassword2=document.querySelector(".regpassword2");
+            sub1=document.querySelector(".sub1");
+            sub2=document.querySelector(".sub2");
+            sub1.addEventListener("click",function(event){
+                if (llogin.value!="" && lpassword.value!=""){
+                    $.ajax({
+	                    url: 'checkuser.php',         /* Куда пойдет запрос */
+	                    method: 'get', 
+                        data:{
+                            login:llogin.value,
+                            pass:lpassword.value
+                        },            /* Метод передачи (post или get) */
+	                    dataType: 'html',          /* Тип данных в ответе (xml, json, script, html). */    /* Параметры передаваемые в запросе. */
+	                    success: function(data){
+   /* функция которая будет выполнена после успешного запроса.  */
+		                    if (data!='-1'){
+					localStorage.setItem("islog","yes");
+					localStorage.setItem("logname",llogin.value);
+					localStorage.setItem("logid",data);
+					window.location.href = 'EfimPech.html';
+				    }else if(data=='-1'){
+					alert("Неверный логин или пароль!");
+				    }
+                        },
+                        error:function(data){   /* функция которая будет выполнена после успешного запроса.  */
+		                    alert("Error!")
+                        },
+                    });}
+			else{
+                    alert("Заполните пустые поля!");
+                }
+            });
+            sub2.addEventListener("click",function(event){
+                if (rlogin.value!="" && rpassword1.value!="" && rpassword2.value!=""){
+                    if (rpassword1.value==rpassword2.value){
+		    let ans=rlogin.value;
+		    alert(rlogin.value);
+                    $.ajax({
+	                url: 'insertuser.php',         /* Куда пойдет запрос */
+	                method: 'get', 
+                        data:{
+				login:rlogin.value,
+				pass:rpassword1.value
+			},            /* Метод передачи (post или get) */
+	                dataType: 'html',          /* Тип данных в ответе (xml, json, script, html). */    /* Параметры передаваемые в запросе. */
+	                success: function(data){   /* функция которая будет выполнена после успешного запроса.  */
+                        },
+                        error:function(data){   /* функция которая будет выполнена после успешного запроса.  */
+		                    alert("Error!")
+                        },
+                    });
+                    }else{
+                        alert("Пароли не совпадают");
+                    }
+                }else{
+                    alert("Заполните пустые поля!");
+                }
+            });
+        </script>
+    </body>
+</html>
